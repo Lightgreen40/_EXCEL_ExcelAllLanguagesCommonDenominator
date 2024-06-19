@@ -17,12 +17,12 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
         {
             //Replace these paths with your actual file paths:
             Console.WriteLine("State filepath to first bilingual Excel file:");
-            string firstExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
+            string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
             //string firstExcelFile = Console.ReadLine();
             Console.WriteLine();
 
             Console.WriteLine("State filepath to second bilingual Excel file:");
-            string secondExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
+            string secondExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
             //string secondExcelFile = Console.ReadLine();
             Console.WriteLine();
 
@@ -41,7 +41,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static List<Dictionary<string, string>> ReadExcelData(string filePath)
+        private static Dictionary<string, string> ReadExcelData(string filePath)
         {
             Excel.Application excelApplication = new Excel.Application();
             excelApplication.Visible = false;
@@ -51,11 +51,9 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             int lastRow = excelWorksheet.UsedRange.Rows.Count;
             int lastColumn = excelWorksheet.UsedRange.Columns.Count;
 
-            List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
+            Dictionary<string, string> rowData = new Dictionary<string, string>();
             for (int row = 2; row <= lastRow; row++)   //"row = 2" => assuming that first row is headings "English", "German", etc.
             {
-                Dictionary<string, string> rowData = new Dictionary<string, string>();
-
                 //Only iterate over columns A and B (1 and 2 in Excel Interop):
                 string key = excelWorksheet.Cells[row, 1].Value2?.ToString();   //captures column A row 2 cell value, then r3, and so on ...
                 string value = excelWorksheet.Cells[row, 2].Value2?.ToString();   //captures column B row 2 cell value, then r3, and so on ...
@@ -65,36 +63,44 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 {
                     rowData.Add(key, value);
                 }
-
-                data.Add(rowData);
             }
 
             excelWorkbook.Close();
             excelApplication.Quit();
 
-            return data;
+            return rowData;
         }
 
 
 
 
-        private static List<Dictionary<string, string>> GetMatchingRows(List<Dictionary<string, string>> firstExcelData, List<Dictionary<string, string>> secondExcelData)
+        private static Dictionary<string, string> GetMatchingRows(Dictionary<string, string> firstExcelData, Dictionary<string, string> secondExcelData)
         {
-            List<Dictionary<string, string>> matchedData = new List<Dictionary<string, string>>();
+            List<string, string, string> matchedData = new List<string, string, string>();   //new some collection able to hold three string values!
 
-            foreach (var sourceTextAndtranslationRow in firstExcelData)
+            foreach (var sourceTextAndtranslationRow_ in firstExcelData)
             {
-                var englishText = sourceTextAndtranslationRow["ENGLISH"];
-                var matchingRow = secondExcelData.FirstOrDefault(row => row["ENGLISH"] == englishText);
-                if (matchingRow != null)
+                foreach (var sourceTextAndtranslationRow__ in secondExcelData)
                 {
-                    matchedData.Add(new Dictionary<string, string>()
-                {
-                    { "ENGLISH", englishText },
-                    { "GERMAN", sourceTextAndtranslationRow["GERMAN"] },
-                    { "SWEDISH", matchingRow["SWEDISH"] }
-                });
+                    if (sourceTextAndtranslationRow_.Key == sourceTextAndtranslationRow__.Key)
+                    {
+                        matchedData.Add(sourceTextAndtranslationRow_.Key, sourceTextAndtranslationRow_.Value, sourceTextAndtranslationRow__.Value);   //source text + translation first (e.g. German) + translation second (e.g. Swedish)!
+                    }
                 }
+
+
+
+                //var englishText = sourceTextAndtranslationRow["ENGLISH"];
+                //var matchingRow = secondExcelData.FirstOrDefault(row => row["ENGLISH"] == englishText);
+                //if (matchingRow != null)
+                //{
+                //    matchedData.Add(new Dictionary<string, string>()
+                //{
+                //    { "ENGLISH", englishText },
+                //    { "GERMAN", sourceTextAndtranslationRow["GERMAN"] },
+                //    { "SWEDISH", matchingRow["SWEDISH"] }
+                //});
+                //}
             }
 
             return matchedData;
@@ -103,7 +109,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static void CreateMergedExcel(string filePath, List<Dictionary<string, string>> data)
+        private static void CreateMergedExcel(string filePath, Dictionary<string, string> data)
         {
             var excelApp = new Excel.Application();
             excelApp.Visible = false;
