@@ -51,6 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="testfiles\en-DE-SV_merged.xlsx" />
+    <None Include="testfiles\en-DE.xlsx" />
+    <None Include="testfiles\en-SV.xlsx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
