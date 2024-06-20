@@ -33,9 +33,9 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             var firstExcelData = ReadExcelData(firstExcelFile);
             var secondExcelData = ReadExcelData(secondExcelFile);
 
-            Console.ReadLine();   //debug
-
             var matchedData = GetMatchingRows(firstExcelData, secondExcelData);
+
+            Console.ReadLine();   //debug
 
             CreateMergedExcel(mergedFile, matchedData);
         }
@@ -67,6 +67,8 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 }
             }
 
+            Console.WriteLine();
+
             excelWorkbook.Close();
             excelApplication.Quit();
 
@@ -87,24 +89,17 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 {
                     if (sourceTextAndtranslationRow_.Key == sourceTextAndtranslationRow__.Key)
                     {
-                        matchedData.Add(sourceTextAndtranslationRow_.Key, sourceTextAndtranslationRow_.Value, sourceTextAndtranslationRow__.Value);   //source text + translation first (e.g. German) + translation second (e.g. Swedish)!
+                        matchedData.Add(new Tuple<string, string, string>(sourceTextAndtranslationRow_.Key, sourceTextAndtranslationRow_.Value, sourceTextAndtranslationRow__.Value));   //this is how to add Tuples to that Tuple list; source text + translation first (e.g. German) + translation second (e.g. Swedish)!
                     }
                 }
-
-
-
-                //var englishText = sourceTextAndtranslationRow["ENGLISH"];
-                //var matchingRow = secondExcelData.FirstOrDefault(row => row["ENGLISH"] == englishText);
-                //if (matchingRow != null)
-                //{
-                //    matchedData.Add(new Dictionary<string, string>()
-                //{
-                //    { "ENGLISH", englishText },
-                //    { "GERMAN", sourceTextAndtranslationRow["GERMAN"] },
-                //    { "SWEDISH", matchingRow["SWEDISH"] }
-                //});
-                //}
             }
+
+            //debug:
+            foreach (var item in matchedData)
+            {
+                Console.WriteLine("matchedDate:" + item.Item1 + " " + item.Item2 + " " + item.Item3);
+            }
+            Console.WriteLine();
 
             return matchedData;
         }
