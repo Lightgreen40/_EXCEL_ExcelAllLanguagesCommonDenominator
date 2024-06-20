@@ -17,12 +17,14 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
         {
             //Replace these paths with your actual file paths:
             Console.WriteLine("State filepath to first bilingual Excel file:");
-            string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
+            string firstExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
+            //string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
             //string firstExcelFile = Console.ReadLine();
             Console.WriteLine();
 
             Console.WriteLine("State filepath to second bilingual Excel file:");
-            string secondExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
+            string secondExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
+            //string secondExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
             //string secondExcelFile = Console.ReadLine();
             Console.WriteLine();
 
@@ -74,9 +76,10 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static Dictionary<string, string> GetMatchingRows(Dictionary<string, string> firstExcelData, Dictionary<string, string> secondExcelData)
+        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> firstExcelData, Dictionary<string, string> secondExcelData)
         {
-            List<string, string, string> matchedData = new List<string, string, string>();   //new some collection able to hold three string values!
+            List<Tuple<string, string, string>> matchedData = new List<Tuple<string, string, string>>();   //this is how you store multiple values in a list, here as "3-tuples" (more than the merely 2's in a dictionary)
+
 
             foreach (var sourceTextAndtranslationRow_ in firstExcelData)
             {
@@ -109,7 +112,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static void CreateMergedExcel(string filePath, Dictionary<string, string> data)
+        private static void CreateMergedExcel(string filePath, List<Tuple<string, string, string>> data)
         {
             var excelApp = new Excel.Application();
             excelApp.Visible = false;
@@ -122,13 +125,13 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             worksheet.Cells[1, 3] = "Target language 2";
 
             int row = 2;
-            foreach (var item in data)
-            {
-                worksheet.Cells[row, 1] = item["ENGLISH"];
-                worksheet.Cells[row, 2] = item["GERMAN"];
-                worksheet.Cells[row, 3] = item["SWED swedishData"];
-                row++;
-            }
+            //foreach (var item in data)
+            //{
+            //    worksheet.Cells[row, 1] = item["ENGLISH"];
+            //    worksheet.Cells[row, 2] = item["GERMAN"];
+            //    worksheet.Cells[row, 3] = item["SWED swedishData"];
+            //    row++;
+            //}
 
             workbook.SaveAs(filePath);
             workbook.Close();
