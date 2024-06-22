@@ -20,26 +20,25 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 Console.WriteLine("State filepath to first bilingual Excel file:");
                 //string firstExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
                 //string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
-                string firstExcelFile = Console.ReadLine();
+                string initialExcelFile = Console.ReadLine();
                 Console.WriteLine();
 
-                Console.WriteLine("State filepath to second bilingual Excel file:");
-                //string secondExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
-                //string secondExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-SV.xlsx";   //debug
-                 string secondExcelFile = Console.ReadLine();
+                Console.WriteLine(@"State filepaths to other bilingual Excel files. Format: Filepaths, separated by semicolons, no linebreaks. Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
+                 string toBeMergedExcelFiles = Console.ReadLine();
+                 List<string> toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
                 Console.WriteLine();
 
-                string mergedFile = Path.GetDirectoryName(firstExcelFile) + @"\" + "merged_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "." + Path.GetExtension(firstExcelFile);
+                string mergedFile = Path.GetDirectoryName(initialExcelFile) + @"\" + "merged_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "." + Path.GetExtension(initialExcelFile);
 
-                Dictionary<string, string> firstExcelData = ReadExcelData(firstExcelFile);
-                Dictionary<string, string> secondExcelData = ReadExcelData(secondExcelFile);
+                Dictionary<string, string> initialExcelData = ReadExcelData(initialExcelFile);
+                Dictionary<string, string> toBeMergedExcelFilesData = ReadExcelData(toBeMergedExcelFiles);
 
-                List<Tuple<string, string, string>> matchedData = GetMatchingRows(firstExcelData, secondExcelData);
+                List<Tuple<string, string, string>> matchedData = GetMatchingRows(initialExcelData, toBeMergedExcelFilesData);
 
                 CreateMergedExcel(mergedFile, matchedData);
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Successfully created merged Excel (same directory as first Excel file)");
+                Console.WriteLine("Successfully created merged Excel (see directory of initial Excel file)");
                 Console.ResetColor();
             }
             catch (Exception exception)
@@ -107,7 +106,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> firstExcelData, Dictionary<string, string> secondExcelData)
+        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> initialExcelData, Dictionary<string, string> toBeMergedExcelFileslData)
         {
             Console.WriteLine("Matching rows ...");
 
@@ -115,9 +114,9 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             {
                 List<Tuple<string, string, string>> matchedData = new List<Tuple<string, string, string>>();   //this is how you store multiple values in a list, here as "3-tuples" (more than the merely 2's in a dictionary)
 
-                foreach (KeyValuePair<string, string> sourceTextAndtranslationRow_ in firstExcelData)
+                foreach (KeyValuePair<string, string> sourceTextAndtranslationRow_ in initialExcelData)
                 {
-                    foreach (KeyValuePair<string, string> sourceTextAndtranslationRow__ in secondExcelData)
+                    foreach (KeyValuePair<string, string> sourceTextAndtranslationRow__ in toBeMergedExcelFileslData)
                     {
                         if (sourceTextAndtranslationRow_.Key == sourceTextAndtranslationRow__.Key)
                         {
