@@ -26,6 +26,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 Console.WriteLine(@"State filepaths to other bilingual Excel files. Format: Filepaths, separated by semicolons, no linebreaks. Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
                  string toBeMergedExcelFiles = Console.ReadLine();
                  List<string> toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
+                int amountFilesToBeMerged = toBeMergedExcelFilesList.Count();
                 Console.WriteLine();
 
                 string mergedFile = Path.GetDirectoryName(initialExcelFile) + @"\" + "merged_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "." + Path.GetExtension(initialExcelFile);
