@@ -13,29 +13,34 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 {
     class Program
     {
+        static string mergedFile = "";
+
+
         static void Main(string[] args)
         {
             try
             {
-                Console.WriteLine("State filepath to first bilingual Excel file:");
+                Console.WriteLine("State filepaths to bilingual Excel files to be merged, format: filepaths, separated by semicolons, no linebreaks.");
+                Console.WriteLine(@"Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
                 //string firstExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
                 //string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
-                string initialExcelFile = Console.ReadLine();
+                string toBeMergedExcelFiles = Console.ReadLine();
                 Console.WriteLine();
 
-                Console.WriteLine(@"State filepaths to other bilingual Excel files. Format: Filepaths, separated by semicolons, no linebreaks. Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
-                 string toBeMergedExcelFiles = Console.ReadLine();
-                 List<string> toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
-                Console.WriteLine();
+                List<string> toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
 
-                string mergedFile = Path.GetDirectoryName(initialExcelFile) + @"\" + "merged_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "." + Path.GetExtension(initialExcelFile);
 
-                Dictionary<string, string> initialExcelData = ReadExcelData(initialExcelFile);
-                Dictionary<string, string> toBeMergedExcelFilesData = ReadExcelData(toBeMergedExcelFiles);
 
-                List<Tuple<string, string, string>> matchedData = GetMatchingRows(initialExcelData, toBeMergedExcelFilesData);
+                foreach (string item in toBeMergedExcelFilesList)
+                {
+                    Dictionary<string, string> toBeMergedExcelFilesData = ReadExcelData(toBeMergedExcelFiles);
+                }
+
+
+                List<Tuple<string, string, string>> matchedData = GetMatchingRows(toBeMergedExcelFilesData);
 
                 CreateMergedExcel(mergedFile, matchedData);
+
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Successfully created merged Excel (see directory of initial Excel file)");
@@ -52,9 +57,11 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static Dictionary<string, string> ReadExcelData(string filePath)
+        private static Dictionary<string, string> ReadExcelData(string toBeMergedExcelFiles)
         {
             Console.WriteLine("Reading Excel files ...");
+
+            string mergedFile = Path.GetDirectoryName(toBeMergedExcelFilesList[0]) + @"\" + "merged_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "." + Path.GetExtension(toBeMergedExcelFilesList[0]);
 
             Excel.Application excelApplication = null;
             Excel.Workbook excelWorkbook = null;
@@ -63,7 +70,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             {
                 excelApplication = new Excel.Application();
                 excelApplication.Visible = false;
-                excelWorkbook = excelApplication.Workbooks.Open(filePath);
+                excelWorkbook = excelApplication.Workbooks.Open(toBeMergedExcelFiles);
                 Excel.Worksheet excelWorksheet = excelWorkbook.Worksheets[1];   //assuming that FIRST worksheet is the one
 
                 int lastRow = excelWorksheet.UsedRange.Rows.Count;
@@ -106,11 +113,11 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> initialExcelData, Dictionary<string, string> toBeMergedExcelFileslData)
+        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> toBeMergedExcelFileslData)
         {
             Console.WriteLine("Matching rows ...");
 
-            try
+            try   //try LINQ instead to avoid unknown number of nested foreach loops and make code scalable
             {
                 List<Tuple<string, string, string>> matchedData = new List<Tuple<string, string, string>>();   //this is how you store multiple values in a list, here as "3-tuples" (more than the merely 2's in a dictionary)
 
