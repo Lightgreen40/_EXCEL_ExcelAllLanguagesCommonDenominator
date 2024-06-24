@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +14,6 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
     class Program
     {
         static string mergedFile = "";
-        static List<string> toBeMergedExcelFilesList = null;
 
 
         static void Main(string[] args)
@@ -31,36 +30,26 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 Console.WriteLine();
 
                 //step 2 splitting var into list of single paths - DONE:
-                toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
-                foreach (var item in toBeMergedExcelFilesList)   //debug
-                {
-                    Console.WriteLine("toBeMergedExcelFilesList: " + item);
-                }                
+                List<string> toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
 
                 //step 3 extract bilingual data of each Excel into SEPARATE dictionary = 'dictionary ID, col A, col B' - PENDING:
                 int dictID = 0;
-                List<Tuple<int, string, string>> collatedData = new List<Tuple<int, string, string>>();
                 foreach (string toBeMergedExcelFilesListSinglePath in toBeMergedExcelFilesList)
                 {
-                    collatedData = ReadExcelData(toBeMergedExcelFilesListSinglePath, dictID);
-                    Console.WriteLine(collatedData[0].Item1 + " " + collatedData[0].Item2 + " " + collatedData[0].Item3);
-                    //collatedData.Add(new Tuple<int, string, string>(collatedData));
+                    List<Tuple<int, string, string>> = ReadExcelData(toBeMergedExcelFilesListSinglePath, dictID);
                     dictID++;
                 }
 
-                //foreach (var item in collatedData)
-                //{
-                //    Console.WriteLine(item.Item1 + " " + item.Item2 + " " + item.Item3);
-                //}
-
-                Console.ReadLine();
 
 
 
 
-                //List<Tuple<string, string, string>> matchedData = GetMatchingRows(toBeMergedExcelFilesData);
 
-                //CreateMergedExcel(mergedFile, matchedData);
+
+
+                List<Tuple<string, string, string>> matchedData = GetMatchingRows(toBeMergedExcelFilesData);
+
+                CreateMergedExcel(mergedFile, matchedData);
 
 
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -91,13 +80,13 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
             {
                 excelApplication = new Excel.Application();
                 excelApplication.Visible = false;
-                excelWorkbook = excelApplication.Workbooks.Open(toBeMergedExcelFilesListSinglePath);
+                excelWorkbook = excelApplication.Workbooks.Open(toBeMergedExcelFiles);
                 Excel.Worksheet excelWorksheet = excelWorkbook.Worksheets[1];   //assuming that FIRST worksheet is the one
 
                 int lastRow = excelWorksheet.UsedRange.Rows.Count;
                 int lastColumn = excelWorksheet.UsedRange.Columns.Count;
 
-                List<Tuple<int, string, string>> rowData = new List<Tuple<int, string, string>>();
+                Dictionary<string, string> rowData = new Dictionary<string, string>();
                 for (int row = 2; row <= lastRow; row++)   //"row = 2" => assuming that first row is headings "English", "German", etc.
                 {
                     //Only iterate over columns A and B (1 and 2 in Excel Interop):
@@ -107,7 +96,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
                     if (key != null && value != null)   //Add only if both key and value are not null
                     {
-                        rowData.Add(new Tuple<int, string, string>(dictID, key, value));   //have to state "new Tuple<..."
+                        rowData.Add(key, value);
                     }
                 }
 
@@ -134,43 +123,43 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
 
 
-        //private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> toBeMergedExcelFileslData)
-        //{
-        //    Console.WriteLine("Matching rows ...");
+        private static List<Tuple<string, string, string>> GetMatchingRows(Dictionary<string, string> toBeMergedExcelFileslData)
+        {
+            Console.WriteLine("Matching rows ...");
 
-        //    try   //try LINQ instead to avoid unknown number of nested foreach loops and make code scalable
-        //    {
-        //        List<Tuple<string, string, string>> matchedData = new List<Tuple<string, string, string>>();   //this is how you store multiple values in a list, here as "3-tuples" (more than the merely 2's in a dictionary)
+            try   //try LINQ instead to avoid unknown number of nested foreach loops and make code scalable
+            {
+                List<Tuple<string, string, string>> matchedData = new List<Tuple<string, string, string>>();   //this is how you store multiple values in a list, here as "3-tuples" (more than the merely 2's in a dictionary)
 
-        //        foreach (KeyValuePair<string, string> sourceTextAndtranslationRow_ in initialExcelData)
-        //        {
-        //            foreach (KeyValuePair<string, string> sourceTextAndtranslationRow__ in toBeMergedExcelFileslData)
-        //            {
-        //                if (sourceTextAndtranslationRow_.Key == sourceTextAndtranslationRow__.Key)
-        //                {
-        //                    matchedData.Add(new Tuple<string, string, string>(sourceTextAndtranslationRow_.Key, sourceTextAndtranslationRow_.Value, sourceTextAndtranslationRow__.Value));   //this is how to add Tuples to that Tuple list; source text + translation first (e.g. German) + translation second (e.g. Swedish)!
-        //                }
-        //            }
-        //        }
+                foreach (KeyValuePair<string, string> sourceTextAndtranslationRow_ in initialExcelData)
+                {
+                    foreach (KeyValuePair<string, string> sourceTextAndtranslationRow__ in toBeMergedExcelFileslData)
+                    {
+                        if (sourceTextAndtranslationRow_.Key == sourceTextAndtranslationRow__.Key)
+                        {
+                            matchedData.Add(new Tuple<string, string, string>(sourceTextAndtranslationRow_.Key, sourceTextAndtranslationRow_.Value, sourceTextAndtranslationRow__.Value));   //this is how to add Tuples to that Tuple list; source text + translation first (e.g. German) + translation second (e.g. Swedish)!
+                        }
+                    }
+                }
 
-        //        foreach (Tuple<string, string, string> item in matchedData)
-        //        {
-        //            Console.WriteLine("matchedDate:" + item.Item1 + " " + item.Item2 + " " + item.Item3);
-        //        }
-        //        Console.WriteLine();
+                foreach (Tuple<string, string, string> item in matchedData)
+                {
+                    Console.WriteLine("matchedDate:" + item.Item1 + " " + item.Item2 + " " + item.Item3);
+                }
+                Console.WriteLine();
 
-        //        return matchedData;
+                return matchedData;
 
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Red;
-        //        Console.WriteLine(">>> ERROR <<<: " + exception);
-        //        Console.ResetColor();
+            }
+            catch (Exception exception)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(">>> ERROR <<<: " + exception);
+                Console.ResetColor();
 
-        //        return null;
-        //    }
-        //}
+                return null;
+            }
+        }
 
 
 
