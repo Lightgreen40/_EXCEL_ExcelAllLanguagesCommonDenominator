@@ -35,23 +35,33 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 foreach (var item in toBeMergedExcelFilesList)   //debug
                 {
                     Console.WriteLine("toBeMergedExcelFilesList: " + item);
-                }                
+                }
 
                 //step 3 extract bilingual data of each Excel into SEPARATE dictionary = 'dictionary ID, col A, col B' - PENDING:
                 int dictID = 0;
                 List<Tuple<int, string, string>> collatedData = new List<Tuple<int, string, string>>();
                 foreach (string toBeMergedExcelFilesListSinglePath in toBeMergedExcelFilesList)
                 {
-                    collatedData = ReadExcelData(toBeMergedExcelFilesListSinglePath, dictID);
-                    Console.WriteLine(collatedData[0].Item1 + " " + collatedData[0].Item2 + " " + collatedData[0].Item3);
-                    //collatedData.Add(new Tuple<int, string, string>(collatedData));
+                    List<Tuple<int, string, string>> dataFromExcel = ReadExcelData(toBeMergedExcelFilesListSinglePath, dictID);   //have to store LIST of tuples in temporary additional list "dataFromExcel" as you cannot add a list to a list, but only the tuples ot the list of tuples!!
+
+                    foreach (Tuple<int, string, string> tuple in dataFromExcel)   //each tuple represents one row of current Excel
+                    {
+                        collatedData.Add(tuple);
+                    }
+
                     dictID++;
                 }
 
-                //foreach (var item in collatedData)
-                //{
-                //    Console.WriteLine(item.Item1 + " " + item.Item2 + " " + item.Item3);
-                //}
+                //debug:
+                foreach (var item in collatedData)
+                {
+                    Console.WriteLine(item.Item1 + " " + item.Item2 + " " + item.Item3);
+                }
+
+                //comparison algorithm:
+                //step 1: determine number of distinctive dictIDs, e.g. 0, 1, 2 or 0, 1, 2, 3, 4, 5 etc.
+                //step 2: number determine number of loop cycles
+
 
                 Console.ReadLine();
 
