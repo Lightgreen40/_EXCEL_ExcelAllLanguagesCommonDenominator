@@ -21,14 +21,16 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
         {
             try
             {
-                Console.WriteLine("State filepaths to bilingual Excel files to be merged, format: filepaths, separated by semicolons, no linebreaks.");
-                Console.WriteLine(@"Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
+                Console.WriteLine("Reading paths.txt ...");
+
+                //Console.WriteLine("State filepaths to bilingual Excel files to be merged, format: filepaths, separated by semicolons, no linebreaks.");
+                //Console.WriteLine(@"Example: 'C:\otherExcelFiles\en-FR;C:\otherExcelFiles\en-NO;C:\otherExcelFiles\en-SV;C:\otherExcelFiles\en-FI'");
                 //string firstExcelFile = @"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
                 //string firstExcelFile = @"C:\Users\oelll\Dropbox\_ME\III Professionella Expertis\C# Project\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\en-DE.xlsx";   //debug
 
                 //step 1 saving all paths to single string var - DONE:
-                string toBeMergedExcelFiles = Console.ReadLine();
-                Console.WriteLine();
+                string toBeMergedExcelFiles = File.ReadAllText(@"C:\Users\Bernd\Downloads\Csharp\_EXCEL_ExcelAllLanguagesCommonDenominator\testfiles\paths.txt");
+                //string toBeMergedExcelFiles = Console.ReadLine();
 
                 //step 2 splitting var into list of single paths - DONE:
                 toBeMergedExcelFilesList = new List<string>(toBeMergedExcelFiles.Split(';'));   //notice the subtle difference? Split(";") doesnt work ...
@@ -36,8 +38,10 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
                 {
                     Console.WriteLine("toBeMergedExcelFilesList: " + item);
                 }
+                Console.WriteLine();
 
                 //step 3 extract bilingual data of each Excel into SEPARATE dictionary = 'dictionary ID, col A, col B' - PENDING:
+                //see far below in comment section for possible solution to this tricky problem!
                 int dictID = 0;
                 List<Tuple<int, string, string>> collatedData = new List<Tuple<int, string, string>>();
                 foreach (string toBeMergedExcelFilesListSinglePath in toBeMergedExcelFilesList)
@@ -51,6 +55,7 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
 
                     dictID++;
                 }
+                Console.WriteLine();
 
                 //debug:
                 foreach (var item in collatedData)
@@ -228,3 +233,72 @@ namespace _EXCEL_ExcelAllLanguagesCommonDenominator
         }
     }
 }
+
+
+
+
+/*
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Sample data
+        List<Tuple<int, string, string>> collatedData = new List<Tuple<int, string, string>>()
+        {
+            new Tuple<int, string, string>(0, "This is the story of a dog who got lost in the fog", "Dies ist die Geschichte eines Hundes, der sich im Nebel verirrte."),
+            new Tuple<int, string, string>(0, "The cat is on the roof", "Die Katze ist auf dem Dach."),
+            new Tuple<int, string, string>(0, "Signal improvement", "Signalverbesserung"),
+            new Tuple<int, string, string>(0, "Love in times of science", "Liebe in Zeiten der Wissenschaft."),
+            new Tuple<int, string, string>(1, "I go to the cinema every Thursday", "wertwert"),
+            new Tuple<int, string, string>(1, "Signal improvement", "trwetrw"),
+            new Tuple<int, string, string>(1, "Who are you?", "tretre"),
+            new Tuple<int, string, string>(1, "The cat is on the roof", "ertertert"),
+            new Tuple<int, string, string>(2, "I go to the cinema every Thursday", "Jag gå på bio varje Torsdag."),
+            new Tuple<int, string, string>(2, "Signal improvement", "Signalförbättring"),
+            new Tuple<int, string, string>(2, "Who are you?", "Vem är du?"),
+            new Tuple<int, string, string>(2, "The cat is on the roof", "Katten är på taket.")
+        };
+
+        // Dictionaries to store colA strings from each dictID
+        Dictionary<int, List<string>> colADict = new Dictionary<int, List<string>>();
+
+        // Extract colA strings for each dictID
+        foreach (var tuple in collatedData)
+        {
+            int dictID = tuple.Item1;
+            string colA = tuple.Item2;
+
+            if (!colADict.ContainsKey(dictID))
+            {
+                colADict[dictID] = new List<string>();
+            }
+
+            colADict[dictID].Add(colA);
+        }
+
+        // Find common strings in colA across all dictID
+        var commonStrings = colADict.Values.Aggregate((prevList, nextList) => prevList.Intersect(nextList).ToList());
+
+        // List to store matched strings along with their respective colB values
+        List<Tuple<int, string, string>> matchedStrings = new List<Tuple<int, string, string>>();
+
+        // Add common strings with their colB values to matchedStrings
+        foreach (var commonString in commonStrings)
+        {
+            var matchedTuples = collatedData.Where(tuple => tuple.Item2 == commonString).ToList();
+            matchedStrings.AddRange(matchedTuples);
+        }
+
+        // Output matched strings
+        foreach (var matchedTuple in matchedStrings)
+        {
+            Console.WriteLine($"{matchedTuple.Item1} | {matchedTuple.Item2} | {matchedTuple.Item3}");
+        }
+    }
+}
+
+*/
